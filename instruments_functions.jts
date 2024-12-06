@@ -1,0 +1,203 @@
+function DMMReadImpedance()
+{	
+   
+ 
+  UpdateStatus("DMMReadImpedance"); // Muestra el nombre de la prueba en el estado.
+
+  UpdateStatus("");
+  $outString = ":CONFigure:RESistance"; // Configura el instrumento para medir resistencia de 4 hilos.
+  IviGPIB_Write($DMMHandler, $outString); // Envía el comando al dispositivo GPIB.
+
+  $outString = ":MEASure:RESistance?"; // Solicita la medición de resistencia de 4 hilos.
+  IviGPIB_Write($DMMHandler, $outString); // Envía el comando al dispositivo GPIB.
+  Sleep(1); // Espera 1 segundo para que el dispositivo realice la medición.
+  $measure = IviGPIB_Read($DMMHandler); // Lee el resultado de la medición desde el dispositivo.
+
+  return; // Finaliza la función `DMMReadImpedance`.
+}
+
+function DMMReadVdc()
+{	
+
+  UpdateStatus("DMMReadVdc"); // Muestra el nombre de la prueba en el estado.
+  
+
+  $outString = "READ?"; // Comando para leer la tensión del dispositivo.
+  IviGPIB_Write($GpibHandler, $outString); // Envía el comando al dispositivo GPIB.
+  Sleep(2); // Espera 2 segundos para que el dispositivo procese la solicitud.
+  $measure = IviGPIB_Read($GpibHandler); // Lee el resultado de la medición desde el dispositivo.
+  $VoltageFloat = StringToFloat($measure); // Convierte la medición a un valor numérico flotante.
+  
+  return;
+}
+
+function PSUSetRemoteMode()
+{
+    SetTestName("PSUSetRemoteMode"); // Define el nombre de la prueba actual.
+
+    UpdateStatus("PSUSetRemoteMode"); // Muestra el nombre de la prueba en el estado.
+
+    
+    // Comando para habilitar modo remoto
+    $command = "SYST:REM";
+    IviGPIB_Write($PSUHandler, $command); // Envía el comando a la PSU vía GPIB.
+    Sleep(1); // Espera 1 segundo para procesar.
+    UpdateStatus("Communication established to PSU \n");
+    
+    // Configurar Voltaje a 24V
+    $command = "VOLT 24";
+    IviGPIB_Write($PSUHandler, $command); 
+    Sleep(1); 
+    UpdateStatus("Voltage set to 24 V.");
+    
+    // Configurar Corriente a 1A
+    $command = "CURR 1";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1); 
+    UpdateStatus("Current set to 1 A.");
+    
+    return; // Finaliza la función `PSUSetRemoteMode`.
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// Turn Output On
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+function PSUOutputOn()
+{
+    SetTestName("PSUOutputOn"); // Define el nombre de la prueba actual.
+    
+    UpdateStatus(""); 
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("PSUOutputOn"); // Muestra el nombre de la prueba en el estado.
+    UpdateStatus("");
+ 
+    
+
+    //Activar salida
+    $command = "OUTP ON";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1); 
+
+   
+    
+    return;
+    
+  }
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+//PSUVoltTest
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+  
+function PSUVoltTest()
+  {
+    SetTestName("PSUVoltTest");
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("PSUVoltTest"); // Muestra el nombre de la prueba en el estado.
+    UpdateStatus("");
+    
+   $Name = "PSUVoltTest";
+     // Validar la configuración leyendo los valores establecidos
+    $command = "MEAS:VOLT?";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1);
+    $measure = IviGPIB_Read($PSUHandler); // Leer el voltaje configurado.
+    
+    $measName = $Name; // Nombre de la medición.
+    $measUnit = "Volts"; // Unidad de la medición.
+    $parametric = true; // Indica que la medición es paramétrica.
+    $failOnLimits = true;
+    $lowerLimit =  23;
+    $upperLimit = 25;
+  
+   
+
+
+   RecordMeasurementWithLimits($measName, $measure, $measUnit, $parametric, $lowerLimit, $upperLimit, $failOnLimits); // Registra la medición y verifica si está dentro de los límites.
+    $MeasVolt = "Measured Voltage: " + $measure + " V.";
+ 
+    
+    UpdateStatus($MeasVolt);
+    
+    return;
+   
+    }
+    
+    // ---------------------------------------------------------------------------------------------------------------------------------------------------
+// Turn Output On
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+    function PSUCurrTest()
+    {
+      SetTestName("PSUCurrTest");
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    UpdateStatus("PSUCurrTest"); // Muestra el nombre de la prueba en el estado.
+    UpdateStatus("");
+  
+     $Name = "PSUCurrTest";
+     // Validar la configuración leyendo los valores establecidos
+    $command = "MEAS:CURR?";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1);
+    $measure = IviGPIB_Read($PSUHandler); // Leer la corriente configurada.
+      
+    $measName = $Name; // Nombre de la medición.
+    $measUnit = "mA"; // Unidad de la medición.
+    $parametric = true; // Indica que la medición es paramétrica.
+    $failOnLimits = true;
+    $lowerLimit =  0;
+    $upperLimit = 500;
+  
+   
+
+
+   RecordMeasurementWithLimits($measName, $measure, $measUnit, $parametric, $lowerLimit, $upperLimit, $failOnLimits); // Registra la medición y verifica si está dentro de los límites.
+    $MeasCurr = "Measured Current: " + $measure + " A.";
+ 
+    
+    UpdateStatus($MeasCurr);
+    
+    return;
+      
+
+    }
+    
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// Turn Output Off
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+function PSUOutputOff()
+{
+    SetTestName("PSUOutputOff"); // Define el nombre de la prueba actual.
+    
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    UpdateStatus("PSUOutputOff"); // Muestra el nombre de la prueba en el estado.
+    UpdateStatus("");
+    
+  
+    //Desactivar salida
+    $command = "OUTP OFF";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1); 
+    UpdateStatus("PSU output disabled.");
+    
+    $command = "*RST";
+    IviGPIB_Write($PSUHandler, $command); // Envía el comando SCPI a la PSU.
+    Sleep(2); // Espera 2 segundos para que el reinicio se complete.
+
+    // Confirmar que la PSU fue reiniciada
+    UpdateStatus("PSU has been Reset to default.");
+    
+    return;
+    
+  }
+

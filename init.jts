@@ -1,0 +1,112 @@
+// *************************Jail Test Script File************************************************
+// Product:				
+// Customer:			
+// Software Name:		
+// Author:              
+// **********************************************************************************************
+// **********************************************************************************************
+
+// MAIN TEST ROUTINE
+// 
+// **********************************************************************************************
+
+
+
+
+
+function Initialize()
+{
+    UpdateStatus(""); 
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    UpdateStatus("InitPSU"); // Muestra el nombre de la rutina de inicialización en el estado.
+    UpdateStatus("");
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+
+    // Cadena de recursos para identificar la PSU
+    $ResourceString = "USB0::0xFFFF::0x9200::602204010736720027::INSTR";
+
+    // Abrir la conexión con la PSU
+    $PSUHandler = IviGPIB_Open($ResourceString, 5000); // Timeout de 5 segundos.
+    Sleep(4); // Espera 4 segundos para establecer la conexión.
+
+    // Comando para restablecer la PSU
+    $outString = "*RST"; // Restablece la fuente a su estado inicial.
+    IviGPIB_Write($PSUHandler, $outString);
+    Sleep(4); // Espera 4 segundos para completar el reinicio.
+
+    // Configurar la PSU para modo remoto (opcional, pero común en inicialización)
+    $outString = "SYST:REM";
+    IviGPIB_Write($PSUHandler, $outString);
+    Sleep(2); // Espera 2 segundos para procesar.
+
+    // Confirmar que la PSU está lista
+    UpdateStatus("Communication established to PSU \n");
+    
+    UpdateStatus(""); 
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    UpdateStatus("InitDMM"); // Muestra el nombre de la rutina de inicialización en el estado.
+    UpdateStatus("");
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+
+    $ResourceString = "USB0::0x2A8D::0x1301::MY57201019::INSTR"; // Cadena de recursos que identifica al dispositivo GPIB.
+      
+    $DMMHandler = IviGPIB_Open($ResourceString, 5000); // Abre la conexión con el dispositivo GPIB.
+    Sleep(4); // Espera 4 segundos para establecer la conexión.
+    $outString = "*RST"; // Comando para restablecer el dispositivo.
+    IviGPIB_Write($DMMHandler, $outString); // Envía el comando al dispositivo GPIB.
+    Sleep(4); // Espera 4 segundos para completar el reinicio.
+  
+    
+    
+    
+    
+
+    End; 
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+// CleanUpTest
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------
+function CleanUp()
+{	
+  SetTestName("CleanUp"); // Define el nombre de la prueba como "CleanUp".
+    
+  
+    UpdateStatus("Cleanup"); // Muestra el nombre de la rutina de limpieza en el estado.
+
+
+    End; // Finaliza la función `CleanUp`.
+}
+
+
+// ------------------------------------------------------------------------------------------------------------------------
+// OnAbort
+// ------------------------------------------------------------------------------------------------------------------------
+function OnAbort()
+{
+  SetTestName("OnAbort"); // Define el nombre de la prueba como "OnAbort".
+    
+    UpdateStatus("*******************************************************");                                                                                                                           
+    UpdateStatus("********************OnAbort****************************"); // Muestra un mensaje de aborto de prueba en el estado.
+    UpdateStatus("*******************************************************");
+    
+    End; // Finaliza la función `OnAbort`.
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------
+// OnFail
+// -----------------------------------------------------------------------------------------------------------------------------------------
+function OnFail()
+{
+    SetTestName("OnFail"); // Define el nombre de la prueba como "OnFail".
+    
+    UpdateStatus("*******************************************************");                                                                                                                           
+    UpdateStatus("********************FAIL*******************************"); // Muestra un mensaje de fallo de prueba en el estado.
+    UpdateStatus("*******************************************************");
+    
+    End; // Finaliza la función `OnFail`.
+}

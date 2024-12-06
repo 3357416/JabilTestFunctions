@@ -1,0 +1,155 @@
+// *************************Jail Test Script File************************************************
+// Product:				
+// Customer:			
+// Software Name:		
+// Author:              
+// **********************************************************************************************
+// **********************************************************************************************
+
+// MAIN TEST ROUTINE
+// 
+// **********************************************************************************************
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// SetPSU
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+function PSUSetRemoteMode()
+{
+    SetTestName("PSUSetRemoteMode"); // Define el nombre de la prueba actual.
+    
+    UpdateStatus(""); 
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    UpdateStatus("PSUSetRemoteMode"); // Muestra el nombre de la prueba en el estado.
+    UpdateStatus("");
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    
+    // Comando para habilitar modo remoto
+    $command = "SYST:REM";
+    IviGPIB_Write($PSUHandler, $command); // Envía el comando a la PSU vía GPIB.
+    Sleep(1); // Espera 1 segundo para procesar.
+    UpdateStatus("Communication established to PSU \n");
+    
+    // Configurar Voltaje a 24V
+    $command = "VOLT 24";
+    IviGPIB_Write($PSUHandler, $command); 
+    Sleep(1); 
+    UpdateStatus("Voltage set to 24 V.");
+    
+    // Configurar Corriente a 1A
+    $command = "CURR 1";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1); 
+    UpdateStatus("Current set to 1 A.");
+    
+    return; // Finaliza la función `PSUSetRemoteMode`.
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// Turn Output On
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+function PSUOutputOn()
+{
+    SetTestName("PSUOutputOn"); // Define el nombre de la prueba actual.
+    
+    UpdateStatus(""); 
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    UpdateStatus("PSUOutputOn"); // Muestra el nombre de la prueba en el estado.
+    UpdateStatus("");
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    
+    // Comando para habilitar modo remoto
+    $command = "SYST:REM";
+    IviGPIB_Write($PSUHandler, $command); // Envía el comando a la PSU vía GPIB.
+    Sleep(1); // Espera 1 segundo para procesar.
+    UpdateStatus("Communication established to PSU \n");
+  
+    //Activar salida
+    $command = "OUTP ON";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1); 
+    UpdateStatus("PSU output ON");
+    
+    // Validar la configuración leyendo los valores establecidos
+    $command = "MEAS:VOLT?";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1);
+    $measuredVoltage = IviGPIB_Read($PSUHandler); // Leer el voltaje configurado.
+    
+    $command = "MEAS:CURR?";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1);
+    $measuredCurrent = IviGPIB_Read($PSUHandler); // Leer la corriente configurada.
+    
+    
+    $MeasVolt = "Measured Voltage: " + $measuredVoltage + " V.";
+    $MeasCurr = "Measured Current: " + $measuredCurrent + " A.";
+    
+    
+    UpdateStatus($MeasVolt);
+    UpdateStatus($MeasCurr);
+    
+    return;
+    
+  }
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// Turn Output Off
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+function PSUOutputOff()
+{
+    SetTestName("PSUOutputOff"); // Define el nombre de la prueba actual.
+    
+    UpdateStatus(""); 
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    UpdateStatus("PSUOutputOff"); // Muestra el nombre de la prueba en el estado.
+    UpdateStatus("");
+    UpdateStatus("-------------------------------------------------");
+    UpdateStatus("");
+    
+    // Comando para habilitar modo remoto
+    $command = "SYST:REM";
+    IviGPIB_Write($PSUHandler, $command); // Envía el comando a la PSU vía GPIB.
+    Sleep(1); // Espera 1 segundo para procesar.
+    UpdateStatus("Communication established to PSU \n");
+  
+    //Desactivar salida
+    $command = "OUTP OFF";
+    IviGPIB_Write($PSUHandler, $command);
+    Sleep(1); 
+    UpdateStatus("PSU output disabled.");
+    
+    $command = "*RST";
+    IviGPIB_Write($PSUHandler, $command); // Envía el comando SCPI a la PSU.
+    Sleep(2); // Espera 2 segundos para que el reinicio se complete.
+
+    // Confirmar que la PSU fue reiniciada
+    UpdateStatus("PSU has been Reset to default.");
+    
+    return;
+    
+  }
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+// InitDMM
+// ---------------------------------------------------------------------------------------------------------------------------------------------------
+
